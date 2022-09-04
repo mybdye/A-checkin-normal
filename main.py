@@ -310,8 +310,8 @@ def checkin():
     以下只适配了editXY主题
     """
     try:
-        plan = re.findall(r'"会员时长", "(.*?)",', response.text)[0]
-        traffic = re.findall(r'"剩余流量", "(.*?)",', response.text)[0]
+        plan = re.findall(r'"Your Plan", "(.*?)",', response.text)[0]
+        traffic = re.findall(r'"Available Data", "(.*?)",', response.text)[0]
         msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
         print('msg:', msg)
         #return msg
