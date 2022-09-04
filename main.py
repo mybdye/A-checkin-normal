@@ -10,7 +10,7 @@ import urllib
 import re
 
 import requests
-from requestium import Session, Keys
+from requests import Session
 import undetected_chromedriver as uc
 from helium import *
 from selenium.webdriver.common.by import By
@@ -19,11 +19,11 @@ from selenium.webdriver.common.by import By
 ssl._create_default_https_context = ssl._create_unverified_context
 
 try:
-    BASE_URL = os.environ['BASE_URL']
+    base_url = os.environ['BASE_URL']
 except:
     # 本地调试用
-    BASE_URL = ''
-
+    base_url = ''
+    
 try:
     USER_ID = os.environ['USER_ID']
 except:
@@ -93,16 +93,13 @@ def speechToText():
 
 
 def getAudioLink():
-    global block
     print('- audio file link searching...')
     if Text('Alternatively, download audio as MP3').exists() or Text('或者以 MP3 格式下载音频').exists():
-        block = False
         try:
             src = Link('Alternatively, download audio as MP3').href
         except:
             src = Link('或者以 MP3 格式下载音频').href
         print('- get src:', src)
-
         # 下载音频文件
         delay(3)
         urllib.request.urlretrieve(src, os.getcwd() + audioFile)
@@ -135,31 +132,33 @@ def getAudioLink():
         print(textblock)
         body = ' *** 💣 Possibly blocked by google! ***\n' + textblock
         push(body)
-        block = True
 
-    elif not CheckBox('I\'m not a robot').is_checked() or CheckBox('我不是机器人').is_checked():
-        print('*** checkbox issue ***')
-        reCAPTCHA()
+    # elif S('#recaptcha-accessible-status').exists():
+    #     print('- recaptcha pass')
+    #     submit()
 
     else:
-        print('*** audio download element not found, stop running ***')
-        # print('- title:', Window().title)
-        # screenshot() # debug
+        try:
+            submit()
+        except:
+            print('*** audio download element not found, stop running ***')
+            # print('- title:', Window().title)
+            screenshot() # debug
 
 
 def reCAPTCHA():
-    global block
     print('- click checkbox')
     click(S('.recaptcha-checkbox-borderAnimation'))
     # screenshot() # debug
-    delay(4)
+    delay(6)
     if S('#recaptcha-audio-button').exists():
         print('- audio button found')
         click(S('#recaptcha-audio-button'))
         # screenshot() # debug
         delay(4)
         getAudioLink()
-        return block
+    else:
+        return False
 
 
 def cloudflareDT():
@@ -201,11 +200,8 @@ def login():
     if Text('I\'m not a robot').exists() or Text('进行人机身份验证').exists():
         # if S('#recaptcha-token').exists():
         print('- reCAPTCHA found!')
-        block = reCAPTCHA()
-        if block:
-            print('*** Possibly blocked by google! ***')
-        else:
-            submit()
+        reCAPTCHA()
+        submit()
     else:
         print('- reCAPTCHA not found!')
         submit()
@@ -216,11 +212,36 @@ def submit():
     try:
         click(Button('登录'))
         print('- submit clicked')
-        delay(2)
+        delay(10)
     except Exception as e:
         print('*** 💣 some error in func submit!, stop running ***\nError:', e)
 
-    cloudflareDT()
+    #cloudflareDT()
+    #driver = get_driver()
+    req = requests.session()  # 会话   打开一个网页，直到关闭浏览器之前 都是会话
+    cookies = get_driver().get_cookies()  # 抓取全部的cookie
+    for cookie in cookies:  # 把cookie加载到自定义的网页中
+        req.cookies.set(cookie['name'], cookie['value'])  # 把cookie加载到req中
+    #req.headers.clear()  # 清空头
+    info_url = base_url + '/user'
+    response = req.get(info_url)
+    print('response:', response)
+    print('response.text:', response.text)
+
+    """
+    以下只适配了editXY主题
+    """
+    try:
+        level = re.findall(r'\["Class", "(.*?)"],', response.text)[0]
+        day = re.findall(r'\["Class_Expire", "(.*)"],', response.text)[0]
+        rest = re.findall(r'\["Unused_Traffic", "(.*?)"]', response.text)[0]
+        msg = "- 今日签到信息：" + "\n- 用户等级：" + str(level) + "\n- 到期时间：" + str(
+            day) + "\n- 剩余流量：" + str(rest)
+        print(msg)
+        return msg
+    except:
+        print('gg')
+        #return msg
 
     try:
         wait_until(Text('Please correct your captcha!.').exists or Text('验证').exists())
@@ -242,14 +263,20 @@ def submit():
     except:
         pass
     try:
-        wait_until(Text('Dashboard').exists() or Text('首页').exists())
+        textList = find_all(S('.card-wrap'))
+        print('- textList', textList)
+        result = [key.web_element.text for key in textList]
+        # checkResult(result)
+        print('*** %s ***' % result)
+        #wait_until(Text('Dashboard').exists() or Text('首页').exists())
+        #print('- login success')
         #userinfo()
-        msg = checkin()
-        print('----', msg)
+        checkin()
+
     except Exception as e:
         body = '*** 💣 some error in func submit!, stop running ***'
         print('Error:', e)
-        write('abc@d.com', into=S('@email'))
+        #write('abc@d.com', into=S('@email'))
         screenshot()  # debug
         sys.exit(body)
 
@@ -284,32 +311,12 @@ def notice():
     print('*** %s ***' % result)
 
 def checkin():
-    s = Session(driver=driver)
-
-    #try:
-        # headers = {
-        #     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-        #     'Referer': base_url + '/user'
-        # }
-        # response = s.post(base_url + '/user/checkin', headers=headers, verify=False)
-        # # print(response.text)
-        # msg = (response.json()).get('msg')
-        # print(msg)
-    info_url = BASE_URL + '/user'
-    response = s.get(info_url, verify=False)
-    """
-    以下只适配了editXY主题
-    """
+    #driver = get_driver()
     try:
-        level = re.findall(r'\["Class", "(.*?)"],', response.text)[0]
-        day = re.findall(r'\["Class_Expire", "(.*)"],', response.text)[0]
-        rest = re.findall(r'\["Unused_Traffic", "(.*?)"]', response.text)[0]
-        msg = "- 今日签到信息：" + "\n- 用户等级：" + str(level) + "\n- 到期时间：" + str(
-            day) + "\n- 剩余流量：" + str(rest)
-        print(msg)
-        return msg
+        click(Button('每日签到'))
     except:
-        return msg
+        click(Button('Daily Bonus'))
+    print('- Checkin finish')
 
 def push(body):
     print('- waiting for push result')
@@ -318,7 +325,7 @@ def push(body):
         print('*** No BARK_KEY ***')
     else:
         barkurl = 'https://api.day.app/' + BARK_KEY
-        title = BASE_URL
+        title = base_url
         rq_bark = requests.get(url=f'{barkurl}/{title}/{body}?isArchive=1')
         if rq_bark.status_code == 200:
             print('- bark push Done!')
@@ -328,7 +335,7 @@ def push(body):
     if TG_BOT_TOKEN == '' or TG_USER_ID == '':
         print('*** No TG_BOT_TOKEN or TG_USER_ID ***')
     else:
-        body = BASE_URL + body
+        body = base_url + body
         server = 'https://api.telegram.org'
         tgurl = server + '/bot' + TG_BOT_TOKEN + '/sendMessage'
         rq_tg = requests.post(tgurl, data={'chat_id': TG_USER_ID, 'text': body}, headers={
@@ -353,5 +360,5 @@ driver = uc.Chrome(use_subprocess=True)
 driver.set_window_size(800, 927)
 delay(2)
 set_driver(driver)
-go_to(BASE_URL+'/auth/login')
+go_to(base_url+'/auth/login')
 login()
