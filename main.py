@@ -217,31 +217,6 @@ def submit():
         print('*** 💣 some error in func submit!, stop running ***\nError:', e)
 
     #cloudflareDT()
-    #driver = get_driver()
-    req = requests.session()  # 会话   打开一个网页，直到关闭浏览器之前 都是会话
-    cookies = get_driver().get_cookies()  # 抓取全部的cookie
-    for cookie in cookies:  # 把cookie加载到自定义的网页中
-        req.cookies.set(cookie['name'], cookie['value'])  # 把cookie加载到req中
-    #req.headers.clear()  # 清空头
-    info_url = base_url + '/user'
-    response = req.get(info_url)
-    print('response:', response)
-    print('response.text:', response.text)
-
-    """
-    以下只适配了editXY主题
-    """
-    try:
-        level = re.findall(r'\["Class", "(.*?)"],', response.text)[0]
-        day = re.findall(r'\["Class_Expire", "(.*)"],', response.text)[0]
-        rest = re.findall(r'\["Unused_Traffic", "(.*?)"]', response.text)[0]
-        msg = "- 今日签到信息：" + "\n- 用户等级：" + str(level) + "\n- 到期时间：" + str(
-            day) + "\n- 剩余流量：" + str(rest)
-        print(msg)
-        return msg
-    except:
-        print('gg')
-        #return msg
 
     try:
         wait_until(Text('Please correct your captcha!.').exists or Text('验证').exists())
@@ -312,10 +287,30 @@ def notice():
 
 def checkin():
     #driver = get_driver()
+    req = requests.session()  # 会话   打开一个网页，直到关闭浏览器之前 都是会话
+    cookies = get_driver().get_cookies()  # 抓取全部的cookie
+    for cookie in cookies:  # 把cookie加载到自定义的网页中
+        req.cookies.set(cookie['name'], cookie['value'])  # 把cookie加载到req中
+    #req.headers.clear()  # 清空头
+    info_url = base_url + '/user'
+    response = req.get(info_url)
+    print('response:', response)
+    print('response.text:', response.text)
+
+    """
+    以下只适配了editXY主题
+    """
     try:
-        click(Button('每日签到'))
+        level = re.findall(r'\["Class", "(.*?)"],', response.text)[0]
+        day = re.findall(r'\["Class_Expire", "(.*)"],', response.text)[0]
+        rest = re.findall(r'\["Unused_Traffic", "(.*?)"]', response.text)[0]
+        msg = "- 今日签到信息：" + "\n- 用户等级：" + str(level) + "\n- 到期时间：" + str(
+            day) + "\n- 剩余流量：" + str(rest)
+        print('msg:', msg)
+        return msg
     except:
-        click(Button('Daily Bonus'))
+        print('gg')
+        #return msg
     print('- Checkin finish')
 
 def push(body):
