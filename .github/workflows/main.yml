@@ -1,0 +1,41 @@
+name: 'Checkin'
+
+on:
+  #push:
+  schedule:
+    # UTC (国内 UTC+8)
+     - cron: '58 4 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    #runs-on: macos-latest
+    runs-on: macos-12
+
+    steps:
+        - name: 'Checkout codes'
+          uses: actions/checkout@v2
+          
+        - name: 'Update Chrome'           
+          run: |
+            brew reinstall --cask google-chrome
+
+        - name: 'Install requirements'
+          run: |
+            pip3 install -r ./requirements.txt
+            pip3 install undetected-chromedriver
+            yes | pip3 uninstall selenium
+            pip3 install selenium==4.2.0
+            
+        - name: 'Renew'
+          env:
+            BASE_URL: ${{ secrets.BASE_URL }}
+            USER_ID: ${{ secrets.USER_ID }}
+            PASS_WD: ${{ secrets.PASS_WD }}
+            BARK_KEY: ${{ secrets.BARK_KEY }}
+            TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+            TG_USER_ID: ${{ secrets.TG_USER_ID }}
+
+          run: |
+            python3 ./main-h.py
