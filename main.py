@@ -210,7 +210,10 @@ def login():
 def submit():
     print('- submit')
     try:
-        click(Button('登录'))
+        try:
+            click(Button('登录'))
+        except:
+            click(Button('Login'))
         print('- submit clicked')
         delay(10)
     except Exception as e:
