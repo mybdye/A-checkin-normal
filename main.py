@@ -23,7 +23,7 @@ try:
 except:
     # 本地调试用
     base_url = ''
-    
+
 try:
     USER_ID = os.environ['USER_ID']
 except:
@@ -74,7 +74,7 @@ def speechToText():
     set_driver(driver)
     text = ''
     i = 0
-    #while text == '':
+    # while text == '':
     while ' ' not in text:
         i = i + 1
         if i > 3:
@@ -143,7 +143,7 @@ def getAudioLink():
         except:
             print('*** audio download element not found, stop running ***')
             # print('- title:', Window().title)
-            screenshot() # debug
+            screenshot()  # debug
 
 
 def reCAPTCHA():
@@ -180,8 +180,8 @@ def login():
     # CF
     cloudflareDT()
 
-    #scrollDown('@login')
-    #scrollDown('.btn btn-primary')
+    # scrollDown('@login')
+    # scrollDown('.btn btn-primary')
 
     print('- fill user id')
     if USER_ID == '':
@@ -216,25 +216,27 @@ def submit():
     except Exception as e:
         print('*** 💣 some error in func submit!, stop running ***\nError:', e)
 
-    #cloudflareDT()
+    # cloudflareDT()
 
     try:
-        wait_until(Text('Please correct your captcha!.').exists or Text('验证').exists())
+        wait_until(Text('Please correct your captcha!.').exists() or Text('验证').exists())
         print('*** Network issue maybe, reCAPTCHA load fail! ***')
     except:
         pass
     try:
-        wait_until(Text('Invalid').exists or Text('密码或邮箱不正确').exists())
+        wait_until(Text('Invalid').exists() or Text('密码或邮箱不正确').exists())
         print('*** Invalid Username / Password ! ***')
     except:
         pass
     try:
-        wait_until(Text('通知').exists)
+        wait_until(Text('通知').exists() or Text('Important Announcement').exists())
         notice()
-        try: click(Button('Read'))
-        except: click(Button('已读'))
+        try:
+            click(Button('Read'))
+        except:
+            click(Button('已读'))
         print('- Read clicked')
-        #renewVPS()
+        # renewVPS()
     except:
         pass
     try:
@@ -243,20 +245,22 @@ def submit():
         result = [key.web_element.text for key in textList]
         # checkResult(result)
         print('*** %s ***' % result)
-        #wait_until(Text('Dashboard').exists() or Text('首页').exists())
-        #print('- login success')
-        #userinfo()
+        # wait_until(Text('Dashboard').exists() or Text('首页').exists())
+        # print('- login success')
+        # userinfo()
         checkin()
 
     except Exception as e:
         body = '*** 💣 some error in func submit!, stop running ***'
         print('Error:', e)
-        #write('abc@d.com', into=S('@email'))
+        # write('abc@d.com', into=S('@email'))
         screenshot()  # debug
         sys.exit(body)
 
+
 def delay(i):
     time.sleep(i)
+
 
 def screenshot():  # debug
     driver = get_driver()
@@ -279,23 +283,25 @@ def screenshot():  # debug
     driver.close()
     # driver.switch_to.window(driver.window_handles[0])
 
+
 def notice():
     textList = find_all(S('.modal-content'))
     result = [key.web_element.text for key in textList][0]
-    #if '' in result:
+    # if '' in result:
     print('*** %s ***' % result)
 
+
 def checkin():
-    #driver = get_driver()
+    # driver = get_driver()
     req = requests.session()  # 会话   打开一个网页，直到关闭浏览器之前 都是会话
     cookies = get_driver().get_cookies()  # 抓取全部的cookie
     for cookie in cookies:  # 把cookie加载到自定义的网页中
         req.cookies.set(cookie['name'], cookie['value'])  # 把cookie加载到req中
-    #req.headers.clear()  # 清空头
+    # req.headers.clear()  # 清空头
     info_url = base_url + '/user'
     response = req.get(info_url)
     print('response:', response)
-    print('response.text:', response.text)
+    #print('response.text:', response.text)
 
     """
     以下只适配了editXY主题
@@ -305,10 +311,12 @@ def checkin():
         traffic = re.findall(r'"剩余流量", "(.*?)",', response.text)[0]
         msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
         print('msg:', msg)
+        #return msg
     except:
         print('gg')
-        #return msg
+        # return msg
     print('- Checkin finish')
+
 
 def push(body):
     print('- waiting for push result')
@@ -340,6 +348,7 @@ def push(body):
     print('- finish!')
     # kill_browser()
 
+
 audioFile = '/audio.mp3'
 imgFile = '/capture.png'
 ##
@@ -352,5 +361,5 @@ driver = uc.Chrome(use_subprocess=True)
 driver.set_window_size(800, 927)
 delay(2)
 set_driver(driver)
-go_to(base_url+'/auth/login')
+go_to(base_url + '/auth/login')
 login()
