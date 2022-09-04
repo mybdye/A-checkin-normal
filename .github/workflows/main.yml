@@ -28,7 +28,7 @@ jobs:
             yes | pip3 uninstall selenium
             pip3 install selenium==4.2.0
             
-        - name: 'Renew'
+        - name: 'Checkin'
           env:
             BASE_URL: ${{ secrets.BASE_URL }}
             USER_ID: ${{ secrets.USER_ID }}
@@ -38,4 +38,4 @@ jobs:
             TG_USER_ID: ${{ secrets.TG_USER_ID }}
 
           run: |
-            python3 ./main-h.py
+            python3 ./main.py
