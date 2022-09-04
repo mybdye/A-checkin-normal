@@ -233,7 +233,7 @@ def submit():
         pass
     try:
         wait_until(Text('通知').exists or Text('Important Announcement').exists)
-        notice()
+        #notice()
         try:
             click(Button('Read'))
         except:
@@ -241,6 +241,7 @@ def submit():
         print('- Read clicked')
         userinfo()
     except:
+        userinfo()
         pass
     try:
         if Text('每日签到').exists or Text('Daily Bonus').exists:
