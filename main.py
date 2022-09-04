@@ -300,7 +300,7 @@ def userinfo():
     result = [key.web_element.text for key in textList]
     # checkResult(result)
     print('*** 用户信息：\n %s ***' % result)
-
+    push(result)
 
 def push(body):
     print('- waiting for push result')
