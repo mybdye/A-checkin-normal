@@ -232,26 +232,26 @@ def submit():
     except:
         pass
     try:
-        wait_until(Text('通知').exists() or Text('Important Announcement').exists())
+        wait_until(Text('通知').exists or Text('Important Announcement').exists)
         notice()
         try:
             click(Button('Read'))
         except:
             click(Button('已读'))
         print('- Read clicked')
-        # renewVPS()
+        userinfo()
     except:
         pass
     try:
-        textList = find_all(S('.card-wrap'))
-        print('- textList', textList)
-        result = [key.web_element.text for key in textList]
-        # checkResult(result)
-        print('*** %s ***' % result)
-        # wait_until(Text('Dashboard').exists() or Text('首页').exists())
-        # print('- login success')
-        # userinfo()
-        checkin()
+        if Text('每日签到').exists or Text('Daily Bonus').exists:
+            try:
+                click('每日签到')
+            except:
+                click('Daily Bonus')
+            print('- Checkin Finish')
+            userinfo()
+        elif Text('明日再来').exists or Text('Come back tomorrow').exists:
+            print('*** Come Back Tomorrow ***')
 
     except Exception as e:
         body = '*** 💣 some error in func submit!, stop running ***'
@@ -294,37 +294,12 @@ def notice():
     print('*** %s ***' % result)
 
 
-def checkin():
-    # driver = get_driver()
-    req = requests.session()  # 会话   打开一个网页，直到关闭浏览器之前 都是会话
-    cookies = get_driver().get_cookies()  # 抓取全部的cookie
-    for cookie in cookies:  # 把cookie加载到自定义的网页中
-        req.cookies.set(cookie['name'], cookie['value'])  # 把cookie加载到req中
-    # req.headers.clear()  # 清空头
-    info_url = base_url + '/user'
-    response = req.get(info_url)
-    print('response:', response)
-    #print('response.text:', response.text)
-
-    """
-    以下只适配了editXY主题
-    """
-    try:
-        try:
-            plan = re.findall(r'(会员时长)\n(\w+)', response.text)
-            traffic = re.findall(r'(剩余流量)\n(.*\s.*)\n', response.text)
-            msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
-            print('msg1:', msg)
-        except:
-            plan = re.findall(r'(Your Plan)\n(\w+)', response.text)
-            traffic = re.findall(r'(Available Data)\n(.*\s.*)\n', response.text)
-            msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
-            print('msg2:', msg)
-        #return msg
-    except:
-        print('gg')
-        # return msg
-    print('- Checkin finish')
+def userinfo():
+    textList = find_all(S('.card-wrap'))
+    # print('- textList', textList)
+    result = [key.web_element.text for key in textList]
+    # checkResult(result)
+    print('*** 用户信息：\n %s ***' % result)
 
 
 def push(body):
