@@ -301,13 +301,10 @@ def checkin():
     以下只适配了editXY主题
     """
     try:
-        level = re.findall(r'\["Class", "(.*?)"],', response.text)[0]
-        day = re.findall(r'\["Class_Expire", "(.*)"],', response.text)[0]
-        rest = re.findall(r'\["Unused_Traffic", "(.*?)"]', response.text)[0]
-        msg = "- 今日签到信息：" + "\n- 用户等级：" + str(level) + "\n- 到期时间：" + str(
-            day) + "\n- 剩余流量：" + str(rest)
+        plan = re.findall(r'"会员时长", "(.*?)",', response.text)[0]
+        traffic = re.findall(r'"剩余流量", "(.*?)",', response.text)[0]
+        msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
         print('msg:', msg)
-        return msg
     except:
         print('gg')
         #return msg
