@@ -304,16 +304,22 @@ def checkin():
     info_url = base_url + '/user'
     response = req.get(info_url)
     print('response:', response)
-    print('response.text:', response.text)
+    #print('response.text:', response.text)
 
     """
     以下只适配了editXY主题
     """
     try:
-        plan = re.findall(r'(Your Plan)\n(\w+)', response.text)
-        traffic = re.findall(r'(Available Data)\n(.*\s.*)\n', response.text)
-        msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
-        print('msg:', msg)
+        try:
+            plan = re.findall(r'(会员时长)\n(\w+)', response.text)
+            traffic = re.findall(r'(剩余流量)\n(.*\s.*)\n', response.text)
+            msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
+            print('msg1:', msg)
+        except:
+            plan = re.findall(r'(Your Plan)\n(\w+)', response.text)
+            traffic = re.findall(r'(Available Data)\n(.*\s.*)\n', response.text)
+            msg = "- 今日签到信息：" + "\n- 用户等级：" + str(plan) + "\n- 剩余流量：" + str(traffic)
+            print('msg2:', msg)
         #return msg
     except:
         print('gg')
