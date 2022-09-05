@@ -178,7 +178,7 @@ def login():
     print('- login')
     delay(1)
     # CF
-    cloudflareDT()
+    #cloudflareDT()
 
     # scrollDown('@login')
     # scrollDown('.btn btn-primary')
