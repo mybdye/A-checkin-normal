@@ -82,7 +82,7 @@ def speechToText():
             break
         attach_file(os.getcwd() + audioFile, 'Upload Audio File')
         print('- waiting for transcribe')
-        delay(6)
+        delay(10)
         driver.switch_to.window(driver.window_handles[1])
         set_driver(driver)
         textlist = find_all(S('.tab-panels--tab-content'))
@@ -94,7 +94,7 @@ def speechToText():
 
 def getAudioLink():
     print('- audio file link searching...')
-    if Text('Alternatively, download audio as MP3').exists or Text('或者以 MP3 格式下载音频').exists:
+    if Text('Alternatively, download audio as MP3').exists() or Text('或者以 MP3 格式下载音频').exists():
         try:
             src = Link('Alternatively, download audio as MP3').href
         except:
@@ -120,14 +120,13 @@ def getAudioLink():
         print('- click recaptcha verify button')
         click(S('#recaptcha-verify-button'))
         delay(3)
-        if Text('Multiple correct solutions required - please solve more.').exists or Text(
-                '需要提供多个正确答案 - 请回答更多问题。').exists:
+        if Text('Multiple correct solutions required - please solve more.').exists() or Text('需要提供多个正确答案 - 请回答更多问题。').exists():
             print('*** Multiple correct solutions required - please solve more. ***')
             click(S('#rc-button goog-inline-block rc-button-reload'))
             getAudioLink()
         delay(1)
 
-    elif Text('Try again later').exists or Text('稍后重试').exists:
+    elif Text('Try again later').exists() or Text('稍后重试').exists():
         textblock = S('.rc-doscaptcha-body-text').web_element.text
         print(textblock)
         body = ' *** 💣 Possibly blocked by google! ***\n' + textblock
@@ -151,7 +150,7 @@ def reCAPTCHA():
     click(S('.recaptcha-checkbox-borderAnimation'))
     # screenshot() # debug
     delay(6)
-    if S('#recaptcha-audio-button').exists:
+    if S('#recaptcha-audio-button').exists():
         print('- audio button found')
         click(S('#recaptcha-audio-button'))
         # screenshot() # debug
@@ -164,7 +163,7 @@ def reCAPTCHA():
 def cloudflareDT():
     try:
         i = 0
-        while Text('Checking your browser before accessing').exists:
+        while Text('Checking your browser before accessing').exists():
             i = i + 1
             print('*** cloudflare 5s detection *** ', i)
             time.sleep(1)
@@ -197,10 +196,11 @@ def login():
         write(PASS_WD, into=S('@password'))
 
     # if Text('reCAPTCHA').exists():
-    if Text('I\'m not a robot').exists or Text('进行人机身份验证').exists:
+    if Text('I\'m not a robot').exists() or Text('进行人机身份验证').exists():
         # if S('#recaptcha-token').exists():
         print('- reCAPTCHA found!')
         reCAPTCHA()
+        delay(2)
         submit()
     else:
         print('- reCAPTCHA not found!')
@@ -244,25 +244,28 @@ def submit():
         pass
     user = userinfo()
     try:
-        #if Text('每日签到').exists or Text('Daily Bonus').exists:
-        wait_until(Text('每日签到').exists or Text('Daily Bonus').exists)
-        try:
-            click('每日签到')
-        except:
-            click('Daily Bonus')
-        print('- Checkin Finish')
-        push(user + '\n签到成功\n' + userinfo())
-        #elif 
+        textList = find_all(S('#checkin-div'))
+        # print('- textList', textList)
+        result = [key.web_element.text for key in textList][0]
+        print('result:', result)
+        if result == '每日签到' or result == 'Daily Bonus':
+            print('- Checkin')
+            click(Link(str(result)))
+            delay(5)
+            # 获取签到奖励信息
+            textList2 = find_all(S('#swal2-content'))
+            # print('- textList', textList)
+            result2 = [key.web_element.text for key in textList2][0]
+            print('- Checkin Finish\n', result2)
+            push(str(user)+'\n🎉'+str(result2))
+
+        elif result == '明日再来' or result == 'Come back tomorrow':
+            print('*** ☑️已经签到了，明日再来 ***')
+            push(str(user)+'\n☑️已经签到了，明日再来')
 
     except:
-#         body = '*** 💣 some error in func submit!, stop running ***'
-#         print('Error:', e)
-#         # write('abc@d.com', into=S('@email'))
-#         screenshot()  # debug
-#         sys.exit(body)
-        wait_until(Text('明日再来').exists or Text('Come back tomorrow').exists)
-        print('*** Come Back Tomorrow ***')
-        push('已经签过了，明日再来\n' + userinfo())
+        print('*** not find checkin***')
+        screenshot()
 
 
 def delay(i):
@@ -337,6 +340,7 @@ def push(body):
             print('*** tg push fail! ***', rq_tg.content.decode('utf-8'))
 
     print('- finish!')
+    delay(300)
     # kill_browser()
 
 
