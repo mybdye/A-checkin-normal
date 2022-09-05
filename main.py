@@ -94,7 +94,7 @@ def speechToText():
 
 def getAudioLink():
     print('- audio file link searching...')
-    if Text('Alternatively, download audio as MP3').exists() or Text('或者以 MP3 格式下载音频').exists():
+    if Text('Alternatively, download audio as MP3').exists or Text('或者以 MP3 格式下载音频').exists:
         try:
             src = Link('Alternatively, download audio as MP3').href
         except:
@@ -120,14 +120,14 @@ def getAudioLink():
         print('- click recaptcha verify button')
         click(S('#recaptcha-verify-button'))
         delay(3)
-        if Text('Multiple correct solutions required - please solve more.').exists() or Text(
-                '需要提供多个正确答案 - 请回答更多问题。').exists():
+        if Text('Multiple correct solutions required - please solve more.').exists or Text(
+                '需要提供多个正确答案 - 请回答更多问题。').exists:
             print('*** Multiple correct solutions required - please solve more. ***')
             click(S('#rc-button goog-inline-block rc-button-reload'))
             getAudioLink()
         delay(1)
 
-    elif Text('Try again later').exists() or Text('稍后重试').exists():
+    elif Text('Try again later').exists or Text('稍后重试').exists:
         textblock = S('.rc-doscaptcha-body-text').web_element.text
         print(textblock)
         body = ' *** 💣 Possibly blocked by google! ***\n' + textblock
@@ -151,7 +151,7 @@ def reCAPTCHA():
     click(S('.recaptcha-checkbox-borderAnimation'))
     # screenshot() # debug
     delay(6)
-    if S('#recaptcha-audio-button').exists():
+    if S('#recaptcha-audio-button').exists:
         print('- audio button found')
         click(S('#recaptcha-audio-button'))
         # screenshot() # debug
@@ -164,7 +164,7 @@ def reCAPTCHA():
 def cloudflareDT():
     try:
         i = 0
-        while Text('Checking your browser before accessing').exists():
+        while Text('Checking your browser before accessing').exists:
             i = i + 1
             print('*** cloudflare 5s detection *** ', i)
             time.sleep(1)
@@ -197,7 +197,7 @@ def login():
         write(PASS_WD, into=S('@password'))
 
     # if Text('reCAPTCHA').exists():
-    if Text('I\'m not a robot').exists() or Text('进行人机身份验证').exists():
+    if Text('I\'m not a robot').exists or Text('进行人机身份验证').exists:
         # if S('#recaptcha-token').exists():
         print('- reCAPTCHA found!')
         reCAPTCHA()
@@ -222,12 +222,12 @@ def submit():
     # cloudflareDT()
 
     try:
-        wait_until(Text('Please correct your captcha!.').exists() or Text('验证').exists())
+        wait_until(Text('Please correct your captcha!.').exists or Text('验证').exists)
         print('*** Network issue maybe, reCAPTCHA load fail! ***')
     except:
         pass
     try:
-        wait_until(Text('Invalid').exists() or Text('密码或邮箱不正确').exists())
+        wait_until(Text('Invalid').exists or Text('密码或邮箱不正确').exists)
         print('*** Invalid Username / Password ! ***')
     except:
         pass
@@ -260,7 +260,7 @@ def submit():
 #         # write('abc@d.com', into=S('@email'))
 #         screenshot()  # debug
 #         sys.exit(body)
-        wait_until(Text('明日再来').exists or Text('Come back tomorrow').exists:)
+        wait_until(Text('明日再来').exists or Text('Come back tomorrow').exists)
         print('*** Come Back Tomorrow ***')
         push('已经签过了，明日再来\n' + userinfo())
 
