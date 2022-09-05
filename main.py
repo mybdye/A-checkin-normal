@@ -239,27 +239,30 @@ def submit():
         except:
             click(Button('已读'))
         print('- Read clicked')
-        userinfo()
     except:
-        userinfo()
+        #userinfo()
         pass
+    user = userinfo()
     try:
-        if Text('每日签到').exists or Text('Daily Bonus').exists:
-            try:
-                click('每日签到')
-            except:
-                click('Daily Bonus')
-            print('- Checkin Finish')
-            userinfo()
-        elif Text('明日再来').exists or Text('Come back tomorrow').exists:
-            print('*** Come Back Tomorrow ***')
+        #if Text('每日签到').exists or Text('Daily Bonus').exists:
+        wait_until(Text('每日签到').exists or Text('Daily Bonus').exists)
+        try:
+            click('每日签到')
+        except:
+            click('Daily Bonus')
+        print('- Checkin Finish')
+        push(user + '\n签到成功\n' + userinfo())
+        #elif 
 
-    except Exception as e:
-        body = '*** 💣 some error in func submit!, stop running ***'
-        print('Error:', e)
-        # write('abc@d.com', into=S('@email'))
-        screenshot()  # debug
-        sys.exit(body)
+    except:
+#         body = '*** 💣 some error in func submit!, stop running ***'
+#         print('Error:', e)
+#         # write('abc@d.com', into=S('@email'))
+#         screenshot()  # debug
+#         sys.exit(body)
+        wait_until(Text('明日再来').exists or Text('Come back tomorrow').exists:)
+        print('*** Come Back Tomorrow ***')
+        push('已经签过了，明日再来\n' + userinfo())
 
 
 def delay(i):
@@ -299,9 +302,11 @@ def userinfo():
     textList = find_all(S('.card-wrap'))
     # print('- textList', textList)
     result = [key.web_element.text for key in textList]
-    # checkResult(result)
-    print('*** 用户信息：\n %s ***' % result)
-    push(result)
+    #checkResult(result)
+    #print('*** 用户信息：\n %s ***' % result)
+    #push(result)
+    result = str(result).replace('[\'', ' -').replace('\',', '').replace('\\n', '\n  ').replace('\']', '').replace('\'', '\n-')
+    return result
 
 def push(body):
     print('- waiting for push result')
