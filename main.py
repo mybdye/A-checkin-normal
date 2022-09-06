@@ -4,14 +4,11 @@
 import base64
 import os
 import ssl
-import sys
 import time
 import urllib
-import re
-
 import requests
-from requests import Session
 import undetected_chromedriver as uc
+
 from helium import *
 from selenium.webdriver.common.by import By
 
