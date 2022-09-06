@@ -337,7 +337,7 @@ def push(body):
             print('*** tg push fail! ***', rq_tg.content.decode('utf-8'))
 
     print('- finish!')
-    delay(300)
+    #delay(300)
     # kill_browser()
 
 
