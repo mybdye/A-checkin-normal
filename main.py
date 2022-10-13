@@ -2,6 +2,7 @@
 
 import requests
 import re
+import os
 
 requests.packages.urllib3.disable_warnings()
 
@@ -9,18 +10,16 @@ requests.packages.urllib3.disable_warnings()
 class SspanelQd(object):
     def __init__(self):
         # 机场地址
-        self.base_url = ''
+        self.base_url = os.environ['BASE_URL']
         # 登录信息
-        self.email = ''
-        self.password = ''
-        # 酷推qq推送
-        self.ktkey = ''
-        # ServerTurbo推送
-        self.SendKey = ''
-        # Qmsg私聊推送
-        self.QmsgKey = ''
+        self.email = os.environ['USER_ID']
+        self.password = os.environ['PASS_WD']
         # Bark Push
-        self.BarkKey = ''
+        self.BarkKey = os.environ['BARK_KEY']
+        # TG Push
+        self.tg_bot_token = os.environ['TG_BOT_TOKEN']
+        self.tg_user_id = os.environ['TG_USER_ID']
+
 
     def checkin(self):
         email = self.email.split('@')
@@ -67,35 +66,6 @@ class SspanelQd(object):
         except:
             return msg
 
-    # Qmsg私聊推送
-    def Qmsg_send(self, msg):
-        if self.QmsgKey == '':
-            return
-        qmsg_url = 'https://qmsg.zendee.cn/send/' + str(self.QmsgKey)
-        data = {
-            'msg': msg,
-        }
-        requests.post(qmsg_url, data=data)
-
-    # Server酱推送
-    def server_send(self, msg):
-        if self.SendKey == '':
-            return
-        server_url = "https://sctapi.ftqq.com/" + str(self.SendKey) + ".send"
-        data = {
-            'text': "今日的流量白嫖到啦！",
-            'desp': msg
-        }
-        requests.post(server_url, data=data)
-
-    # 酷推QQ推送
-    def kt_send(self, msg):
-        if self.ktkey == '':
-            return
-        kt_url = 'https://push.xuthus.cc/send/' + str(self.ktkey)
-        data = ('签到完成，点击查看详细信息~\n' + str(msg)).encode("utf-8")
-        requests.post(kt_url, data=data)
-
     # Bark Push
     def bark_send(self, msg):
         if self.BarkKey == '':
@@ -114,7 +84,7 @@ class SspanelQd(object):
             return
         server = 'https://api.telegram.org'
         tgurl = server + '/bot' + self.tg_bot_token + '/sendMessage'
-        rq_tg = requests.post(tgurl, data={'chat_id': tg_user_id, 'text': msg}, headers={
+        rq_tg = requests.post(tgurl, data={'chat_id': self.tg_user_id, 'text': msg}, headers={
             'Content-Type': 'application/x-www-form-urlencoded'})
         if rq_tg.status_code == 200:
             print('- tg push Done!\nfinish!')
@@ -124,11 +94,8 @@ class SspanelQd(object):
     def main(self):
         msg = self.checkin()
         if msg == False:
-            print("网址不正确或网站禁止访问。")
+            print('请检查网址/账户信息')
         else:
-            self.server_send(msg)
-            self.kt_send(msg)
-            self.Qmsg_send(msg)
             self.bark_send(msg)
             self.tg_send(msg)
 
