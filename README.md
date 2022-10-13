@@ -1,3 +1,5 @@
+[![Checkin](https://github.com/mybdye/A-checkin-normal/actions/workflows/main.yml/badge.svg)](https://github.com/mybdye/A-checkin-normal/actions/workflows/main.yml)
+
 #### ✏️
 - [x] 
 
