@@ -11,22 +11,12 @@ on:
 jobs:
   build:
     #runs-on: macos-latest
-    runs-on: macos-12
+    runs-on: ubuntu-latest
 
     steps:
         - name: 'Checkout codes'
           uses: actions/checkout@v2
-          
-        - name: 'Update Chrome'           
-          run: |
-            brew reinstall --cask google-chrome
 
-        - name: 'Install requirements'
-          run: |
-            pip3 install -r ./requirements.txt
-            pip3 install undetected-chromedriver
-            yes | pip3 uninstall selenium
-            pip3 install selenium==4.2.0
             
         - name: 'Checkin'
           env:
