@@ -57,9 +57,9 @@ class SspanelQd(object):
         以下只适配了editXY主题
         """
         try:
-            level = re.findall(r'\["Class", "(.*?)"],', response.text)[0]
-            day = re.findall(r'\["Class_Expire", "(.*)"],', response.text)[0]
-            rest = re.findall(r'\["Unused_Traffic", "(.*?)"]', response.text)[0]
+            level = re.findall(r'\["card-body", "(.*?)"],', response.text)[0]
+            day = re.findall(r'\["breadcrumb", "(.*)"],', response.text)[0]
+            rest = re.findall(r'\["counter", "(.*?)"]', response.text)[0]
             msg = "- 今日签到信息：" + str(msg) + "\n- 用户等级：" + str(level) + "\n- 到期时间：" + str(day) + "\n- 剩余流量：" + str(rest)
             print(msg)
             return msg
