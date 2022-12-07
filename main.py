@@ -47,7 +47,7 @@ class SspanelQd(object):
             response = session.post(self.base_url + '/user/checkin', headers=headers, verify=False)
             # print(response.text)
             msg = (response.json()).get('msg')
-            print(msg)
+            print('json get msg:', msg)
         except:
             return False
 
@@ -58,12 +58,16 @@ class SspanelQd(object):
         """
         try:
             level = re.findall(r'\["card-body", "(.*?)"],', response.text)[0]
+            print('level:', level)
             day = re.findall(r'\["breadcrumb", "(.*)"],', response.text)[0]
+            print('day:', day)
             rest = re.findall(r'\["counter", "(.*?)"]', response.text)[0]
+            print('rest:', rest)
             msg = "- 今日签到信息：" + str(msg) + "\n- 用户等级：" + str(level) + "\n- 到期时间：" + str(day) + "\n- 剩余流量：" + str(rest)
-            print(msg)
+            print('re find:', msg)
             return msg
-        except:
+        except Exception as e:
+            print('👀 msg:', e)
             return msg
 
     # Bark Push
